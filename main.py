@@ -3,11 +3,13 @@ from abc import ABC, abstractmethod
 from xml.dom import minidom
 
 
-jsonFile = open("Files/jsonFile.json", "r") 
+jsonFile = open("sample-files/data.json", "r") 
 jsonData = json.loads(jsonFile.read())
 
 
-xmlFile = minidom.parse("Files/xmlFile.xml")
+xmlFile = minidom.parse("sample-files/data.xml")
+
+
 
 """
 class Temperature(ABC):
