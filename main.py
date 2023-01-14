@@ -1,100 +1,109 @@
+import os
 import json
+import pandas as pd
+import xml.etree.ElementTree as ET
 from abc import ABC, abstractmethod
-from xml.dom import minidom
 
-
-jsonFile = open("sample-files/data.json", "r") 
-jsonData = json.loads(jsonFile.read())
-
-
-xmlFile = minidom.parse("sample-files/data.xml")
-
-
-
-"""
 class Temperature(ABC):
 
-    def template_method(self) -> None:
+    def template_method(self):
  
-        self.openFile()
-        self.extractData()
-        self.convertData()
-        self.closeFile()
-        self.minData()
-        self.maxData()
-        self.averageData()
-
-    def openFile(self) -> None:
-        print("Temperature says: openFile")
-
-    def readFile(self) -> None:
-        print("Temperature says: readFile")
-
-    def extractData(self) -> None:
-        print("Temperature says: extractData")
-
-    def convertData(self) -> None:
-        print("Temperature says: convertData")
-
-    def closeFile(self) -> None:
-        print("Temperature says: closeFile")
-
-    def minData(self) -> None:
-        print("Temperature says: minData")
-
-    def maxData(self) -> None:
-        print("Temperature says: maxData")
+        self.ExtractData()
+        self.Procces()
     
-    def averageData(self) -> None:
-        print("Temperature says: averageData")
-
     @abstractmethod
-    def readFile(self) -> None:
+    def ExtractData(self):
         pass
 
     @abstractmethod
-    def extractData(self) -> None:
+    def Procces(list):
         pass
-
 
 class TemperatureXML(Temperature):
 
-    def readFile(self) -> None:
-        print("TemperatureXML says: Implemented readFile")
+    def ExtractData(self):
+        mytree = ET.parse("sample-files/data.xml")
+        myroot = mytree.getroot()
+        listdata = []
+        total = 0
+        for data in myroot.findall('row'):
+            meassure = data.findtext('meassure')
+            meassure = float(meassure)
+            total += meassure
+            listdata.append(meassure)
+        return listdata, total
 
-    def extractData(self) -> None:
-        print("TemperatureXML says: Implemented extractData")
-
+    def Procces(self):
+        listdata, total = self.ExtractData()
+        vMin = min(listdata)
+        vMax = max(listdata)
+        aveg = total/len(listdata)
+        print("data: ", listdata, "\nmin: ", vMin, "\nmax: ", vMax, "\naveg: ", round(aveg, 2))
 
 class TemperatureJson(Temperature):
 
-    def readFile(self) -> None:
-        print("TemperatureJson says: Implemented readFile")
+    def ExtractData(self):
+        with open("sample-files/data.json", "r") as jsonFile:
+            jsonData = json.load(jsonFile)
+            listdata = []
+            for data in jsonData:
+                listdata.append(data.get("meassure"))
+        return listdata
 
-    def extractData(self) -> None:
-        print("TemperatureJson says: Implemented extractData")
+    def Procces(self):
+        listdata = self.ExtractData()
+        vMin = min(listdata)
+        vMax = max(listdata)
+        aveg = sum(listdata)/len(listdata)
+        print("data: ", listdata, "\nmin: ", vMin, "\nmax: ", vMax, "\naveg: ", round(aveg, 2))
 
 class TemperatureFlatFile(Temperature):
 
-    def readFile(self) -> None:
-        print("TemperatureFlatFile says: Implemented readFile")
+    def ExtractData(self):
+        flatData = pd.read_csv("sample-files/data.csv", sep="|", usecols=["Meassure"])
+        listdata = []
+        data = flatData.iloc[:].values
+        for row in data:
+            listdata.append(row[0])
+        return listdata
 
-    def extractData(self) -> None:
-        print("TemperatureFlatFile says: Implemented extractData")
+    def Procces(self):
+        listdata = self.ExtractData()
+        vMin = min(listdata)
+        vMax = max(listdata)
+        aveg = sum(listdata)/len(listdata)
+        print("data: ", listdata, "\nmin: ", vMin, "\nmax: ", vMax, "\naveg: ", round(aveg, 2))
 
-def client_code(Temperature: Temperature) -> None:
+def client_code(Temperature: Temperature):
 
     Temperature.template_method()
 
 if __name__ == "__main__":
-    print("Same client code can work with different subclasses:")
-    client_code(TemperatureXML())
-    print("")
+    
+    notValid = True
+    while(notValid):
+        
+        print("What type of file you want to examinate\ntype: flatfile | xmlfile | jsonfile")
+        option = input("option: ")
 
-    print("Same client code can work with different subclasses:")
-    client_code(TemperatureJson())
-    print("")
-
-    print("Same client code can work with different subclasses:")
-    client_code(TemperatureFlatFile())
-"""
+        if option == "flatfile":
+            os.system("cls")
+            print("Extract Flat file result:")
+            client_code(TemperatureFlatFile())
+            input("\nPress Enter to close program")
+            notValid = False
+        elif option == "xmlfile":
+            os.system("cls")
+            print("Extract XML file result:")
+            client_code(TemperatureXML())
+            input("\nPress Enter to close program")
+            notValid = False
+        elif option == "jsonfile":
+            os.system("cls")
+            print("Extract JSON file result:")
+            client_code(TemperatureJson())
+            input("\nPress Enter to close program")
+            notValid = False
+        else:
+            os.system("cls")
+            print("Put a valid type of file")
