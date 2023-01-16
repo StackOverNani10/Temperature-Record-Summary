@@ -39,6 +39,7 @@ class TemperatureXML(Temperature):
         vMax = max(listdata)
         aveg = total/len(listdata)
         print("data: ", listdata, "\nmin: ", vMin, "\nmax: ", vMax, "\naveg: ", round(aveg, 2))
+        sendDataOut(vMin, vMax, aveg)
 
 class TemperatureJson(Temperature):
 
@@ -56,6 +57,7 @@ class TemperatureJson(Temperature):
         vMax = max(listdata)
         aveg = sum(listdata)/len(listdata)
         print("data: ", listdata, "\nmin: ", vMin, "\nmax: ", vMax, "\naveg: ", round(aveg, 2))
+        sendDataOut(vMin, vMax, aveg)
 
 class TemperatureFlatFile(Temperature):
 
@@ -73,6 +75,12 @@ class TemperatureFlatFile(Temperature):
         vMax = max(listdata)
         aveg = sum(listdata)/len(listdata)
         print("data: ", listdata, "\nmin: ", vMin, "\nmax: ", vMax, "\naveg: ", round(aveg, 2))
+        sendDataOut(vMin, vMax, aveg)
+
+def sendDataOut(vMin, vMax, aveg):
+    dataOut = { "min": vMin, "max": vMax, "aveg": round(aveg, 2) }
+    with open("sample-files/data.out.json", "w") as jsonOutFile:
+        json.dump(dataOut, jsonOutFile)
 
 def client_code(Temperature: Temperature):
 
